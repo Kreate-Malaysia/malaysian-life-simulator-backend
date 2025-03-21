@@ -1,8 +1,6 @@
 package config
 
 import (
-	// this will automatically load your .env file:
-
 	"os"
 
 	_ "github.com/joho/godotenv/autoload"
