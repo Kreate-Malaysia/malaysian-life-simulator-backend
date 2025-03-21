@@ -13,19 +13,13 @@ type Config struct {
 }
 
 type PostgresConfig struct {
-	Username string
-	Password string
-	Hostname string
-	DB       string
+	Url string
 }
 
 func LoadConfig() (*Config, error) {
 	cfg := &Config{
 		DB: PostgresConfig{
-			Username: os.Getenv("POSTGRES_USER"),
-			Password: os.Getenv("POSTGRES_PWD"),
-			Hostname: os.Getenv("POSTGRES_HOST"),
-			DB:       os.Getenv("POSTGRES_DB"),
+			Url: os.Getenv("POSTGRES_URL"),
 		},
 	}
 
