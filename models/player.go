@@ -6,6 +6,7 @@ type Player struct {
 	Name            string `json:"name"`
 	Race            string `json:"race"`
 	Gender          string `json:"gender"`
+	School          string `json:"school"`
 	Intelligence    int    `json:"intelligence" default:"50"`
 	Charisma        int    `json:"charisma" default:"50"`
 	Popularity      int    `json:"popularity" default:"50"`
@@ -42,6 +43,10 @@ func (p *Player) GetRace() string {
 // Get Gender
 func (p *Player) GetGender() string {
 	return p.Gender
+}
+
+func (p *Player) GetSchool() string {
+	return p.School
 }
 
 // Get and Set methods for Wealth
