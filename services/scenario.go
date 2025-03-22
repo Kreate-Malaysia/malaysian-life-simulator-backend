@@ -42,32 +42,3 @@ func (sc *ScenarioService) GetAllScenario() ([]models.Scenario, error) {
 
 	return scenarios, nil
 }
-
-// // GetVocabWithCategory fetches vocab with category names
-// func (s *VocabService) GetVocabWithCategory() ([]models.Vocab, error) {
-// 	query := `
-// 		SELECT v.id, v.word, v.meaning, c.name AS category 
-// 		FROM vocab v
-// 		JOIN categories c ON v.category_id = c.id
-// 	`
-
-// 	rows, err := s.DB.Query(query)
-// 	if err != nil {
-// 		log.Println("Error querying vocab:", err)
-// 		return nil, err
-// 	}
-// 	defer rows.Close()
-
-	// var vocabs []models.Vocab
-	// for rows.Next() {
-	// 	var vocab models.Vocab
-	// 	err := rows.Scan(&vocab.ID, &vocab.Word, &vocab.Meaning, &vocab.Category)
-	// 	if err != nil {
-	// 		log.Println("Error scanning vocab row:", err)
-	// 		return nil, err
-	// 	}
-	// 	vocabs = append(vocabs, vocab)
-	// }
-
-	// return vocabs, nil
-// }

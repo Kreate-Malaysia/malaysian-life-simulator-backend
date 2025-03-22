@@ -6,7 +6,7 @@ import (
 	"gin/config"
 	"time"
 
-	"github.com/golang-jwt/jwt/v5"
+	"github.com/golang-jwt/jwt"
 )
 
 type UserService struct {
