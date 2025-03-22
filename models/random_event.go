@@ -4,7 +4,7 @@ type RandomEvent struct {
 	modelImpl
 	ScenarioId    int    	`json:"scenario_id"`
 	Description   string 	`json:"description"`
-	Probability   int    	`json:"probability"`
+	Probability   float64   `json:"probability"`
 	LeadsTo       int    	`json:"leads_to"`
 	Scenario   	  string 	`json:"scenarios,omitempty"` // Scenario name (optional)
 }
@@ -17,7 +17,7 @@ func (re *RandomEvent) GetDescription() string {
 	return re.Description
 }
 
-func (re *RandomEvent) GetProbability() int {
+func (re *RandomEvent) GetProbability() float64 {
 	return re.Probability
 }
 
