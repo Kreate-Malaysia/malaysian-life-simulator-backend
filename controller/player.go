@@ -22,7 +22,6 @@ func (pc *PlayerController) HandleCreatePlayer(w http.ResponseWriter, r *http.Re
         Name        string `json:"name"`
         Gender      string `json:"gender"`
         Race        string `json:"race"`
-        SchoolType  string `json:"school_type"`
     }
 
     // Decode the JSON request body
@@ -54,7 +53,7 @@ func (pc *PlayerController) HandleCreatePlayer(w http.ResponseWriter, r *http.Re
     }
 
     // Extract user_id from the claims
-    userID, ok := decodedData["user_id"].(int) // JWT claims are parsed as float64
+    userID, ok := decodedData["user_id"].(int)
     if !ok {
         http.Error(w, "Invalid user_id in token", http.StatusUnauthorized)
         return

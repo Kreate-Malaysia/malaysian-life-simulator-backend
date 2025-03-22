@@ -32,7 +32,7 @@ func (fc *FeedbackController) HandleCreateFeedback(w http.ResponseWriter, r *htt
     // Call the FeedbackService to create feedback
     feedback, err := fc.FeedbackService.CreateFeedback(payload.ScenarioId, payload.Feedback)
     if err != nil {
-        http.Error(w, "Failed to create feedback", http.StatusInternalServerError)
+        http.Error(w, err.Error(), http.StatusInternalServerError)
         return
     }
 

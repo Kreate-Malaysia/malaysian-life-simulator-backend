@@ -2,7 +2,6 @@ package services
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"gin/models"
 	"math/rand"
@@ -19,7 +18,7 @@ func NewPlayerService(db *sql.DB) *PlayerService {
 }
 
 // CreatePlayer creates a new player in the database
-func (ps *PlayerService) CreatePlayer(userID int, name string, gender string, race string, school string) (*models.Player, error) {
+func (ps *PlayerService) CreatePlayer(userID int, name string, gender string, race string) (*models.Player, error) {
     randomLuck := rand.Intn(101) // Generate a random number between 0 and 100
 
     player := &models.Player{
@@ -27,14 +26,14 @@ func (ps *PlayerService) CreatePlayer(userID int, name string, gender string, ra
         Name:            name,
 		Race:			 race,
 		Gender: 		 gender,
-        School:          school,
-        StudentType:     "",
+        School:          "",
+        StudentType:     "UNKNOWN",
         Intelligence:    50,
         Charisma:        50,
         Popularity:      50,
         Strength:        50,
         Luck:            randomLuck,
-        CurrentScenario: 0 ,
+        CurrentScenario: 1 ,
         EventHistory:    []int{},
     }
 
@@ -61,16 +60,11 @@ func (ps *PlayerService) GetPlayer(playerID int) (*models.Player, error) {
     `
     row := ps.DB.QueryRow(query, playerID)
     var eventHistory []byte
-    err := row.Scan(&player.Id, &player.UserID, &player.Name, &player.Race, &player.Gender, &player.Intelligence, &player.Charisma, &player.Popularity, &player.Strength, &player.Luck, &player.CurrentScenario, &eventHistory)
+    err := row.Scan(&player.Id, &player.UserID, &player.Name, &player.Race, &player.Gender, &player.School, &player.StudentType, &player.Intelligence, &player.Charisma, &player.Popularity, &player.Strength, &player.Luck, &player.CurrentScenario, &eventHistory)
     if err == sql.ErrNoRows {
         return nil, fmt.Errorf("player not found")
     } else if err != nil {
         return nil, fmt.Errorf("failed to retrieve player: %v", err)
-    }
-
-    // Convert eventHistory from JSON to []int
-    if err := json.Unmarshal(eventHistory, &player.EventHistory); err != nil {
-        return nil, fmt.Errorf("failed to parse event history: %v", err)
     }
 
     return player, nil

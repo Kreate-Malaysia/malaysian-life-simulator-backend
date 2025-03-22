@@ -31,7 +31,7 @@ func (sc *ScenarioController) GetScenarioByID(w http.ResponseWriter, r *http.Req
     // Call the service to retrieve the scenario
     scenario, err := sc.ScenarioService.GetScenarioByID(payload.ID)
     if err != nil {
-        http.Error(w, "Failed to retrieve scenario", http.StatusInternalServerError)
+        http.Error(w, err.Error(), http.StatusInternalServerError)
         return
     }
 

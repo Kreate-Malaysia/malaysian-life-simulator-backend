@@ -6,7 +6,7 @@ type Scenario struct {
     IsChoice      bool   `json:"is_choice"`
     IsStory       bool   `json:"is_story"`
     IsRandom      bool   `json:"is_random"`
-    LeadsTo       int   `json:"leads_to"`
+    LeadsTo       *int   `json:"leads_to,omitempty"`
     IsConditional bool   `json:"is_conditional"`
 }
 
@@ -47,11 +47,11 @@ func (sc *Scenario) SetIsRandom(isRandom bool) {
 }
 
 // Get and Set methods for LeadsTo
-func (sc *Scenario) GetLeadsTo() int {
+func (sc *Scenario) GetLeadsTo() *int {
     return sc.LeadsTo
 }
 
-func (sc *Scenario) SetLeadsTo(leadsTo int) {
+func (sc *Scenario) SetLeadsTo(leadsTo *int) {
     sc.LeadsTo = leadsTo
 }
 

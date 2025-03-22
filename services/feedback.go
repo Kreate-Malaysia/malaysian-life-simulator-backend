@@ -23,7 +23,7 @@ func (fs *FeedbackService) CreateFeedback(scenarioId int, feedbackText string) (
     }
 
     query := `
-        INSERT INTO feedback (scenario_id, feedback)
+        INSERT INTO feedbacks (scenario_id, feedback)
         VALUES ($1, $2)
         RETURNING id
     `

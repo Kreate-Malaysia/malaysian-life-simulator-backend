@@ -58,7 +58,7 @@ func SetupRoutes(router *gin.Engine) {
 	})
 
 	//Get Player
-	router.GET("/api/player/get", func(ctx *gin.Context) {
+	router.POST("/api/player/get", func(ctx *gin.Context) {
 		playerController.HandleGetPlayer(ctx.Writer, ctx.Request)
 	})
 
@@ -73,7 +73,7 @@ func SetupRoutes(router *gin.Engine) {
 	})
 
 	//Get Scenario
-	router.GET("/api/scenario", func(ctx *gin.Context) {
+	router.POST("/api/scenario", func(ctx *gin.Context) {
 		scenarioController := controller.NewScenarioController(services.NewScenarioService(database.DB))
 		scenarioController.GetScenarioByID(ctx.Writer, ctx.Request)
 	})

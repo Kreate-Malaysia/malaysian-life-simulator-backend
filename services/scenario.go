@@ -47,7 +47,7 @@ func (sc *ScenarioService) GetAllScenario() ([]models.Scenario, error) {
 func (sc *ScenarioService) GetScenarioByID(id int) (*models.Scenario, error) {
     query := `
         SELECT id, description, is_choice, is_story, is_random, leads_to, is_conditional
-        FROM scenario
+        FROM scenarios
         WHERE id = $1
     `
     row := sc.DB.QueryRow(query, id)
