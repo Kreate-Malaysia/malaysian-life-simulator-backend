@@ -31,18 +31,17 @@ func (ps *PlayerService) CreatePlayer(userID int, name string, gender string, ra
         Charisma:        50,
         Popularity:      50,
         Strength:        50,
-        Wealth:          50,
         Luck:            randomLuck,
         CurrentScenario: 0 ,
         EventHistory:    []int{},
     }
 
     query := `
-        INSERT INTO players (user_id, name, race, gender, intelligence, charisma, popularity, strength, wealth, luck, current_scenario, event_history)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+        INSERT INTO players (user_id, name, race, gender, intelligence, charisma, popularity, strength, luck, current_scenario, event_history)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
         RETURNING id
     `
-    err := ps.DB.QueryRow(query, player.UserID, player.Name, player.Race,player.Gender, player.Intelligence, player.Charisma, player.Popularity, player.Strength, player.Wealth, player.Luck, player.CurrentScenario, "{}").Scan(&player.ID)
+    err := ps.DB.QueryRow(query, player.UserID, player.Name, player.Race,player.Gender, player.Intelligence, player.Charisma, player.Popularity, player.Strength, player.Luck, player.CurrentScenario, "{}").Scan(&player.ID)
     if err != nil {
         return nil, fmt.Errorf("failed to create player: %v", err)
     }
@@ -54,13 +53,13 @@ func (ps *PlayerService) CreatePlayer(userID int, name string, gender string, ra
 func (ps *PlayerService) GetPlayer(playerID int) (*models.Player, error) {
     player := &models.Player{}
     query := `
-        SELECT id, user_id, name, race, gender, intelligence, charisma, popularity, strength, wealth, luck, current_scenario, event_history
+        SELECT id, user_id, name, race, gender, intelligence, charisma, popularity, strength, luck, current_scenario, event_history
         FROM players
         WHERE id = $1
     `
     row := ps.DB.QueryRow(query, playerID)
     var eventHistory []byte
-    err := row.Scan(&player.ID, &player.UserID, &player.Name, &player.Race, &player.Gender, &player.Intelligence, &player.Charisma, &player.Popularity, &player.Strength, &player.Wealth, &player.Luck, &player.CurrentScenario, &eventHistory)
+    err := row.Scan(&player.ID, &player.UserID, &player.Name, &player.Race, &player.Gender, &player.Intelligence, &player.Charisma, &player.Popularity, &player.Strength, &player.Luck, &player.CurrentScenario, &eventHistory)
     if err == sql.ErrNoRows {
         return nil, fmt.Errorf("player not found")
     } else if err != nil {
@@ -78,7 +77,7 @@ func (ps *PlayerService) GetPlayer(playerID int) (*models.Player, error) {
 // UpdatePlayer replaces a player's attributes with new values 
 func (ps *PlayerService) UpdatePlayerStats(playerID int, newStats map[string]int, newScenario int) error {
     // Ensure all expected stats are provided
-    requiredStats := []string{"intelligence", "charisma", "popularity", "strength", "wealth", "luck"}
+    requiredStats := []string{"intelligence", "charisma", "popularity", "strength"}
     for _, stat := range requiredStats {
         if _, exists := newStats[stat]; !exists {
             return fmt.Errorf("missing required stat: %s", stat)

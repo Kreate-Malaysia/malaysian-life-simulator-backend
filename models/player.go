@@ -12,7 +12,6 @@ type Player struct {
 	Charisma        int    `json:"charisma" default:"50"`
 	Popularity      int    `json:"popularity" default:"50"`
 	Strength        int    `json:"strength" default:"50"`
-	Wealth          int    `json:"wealth" default:"50"`
 	Luck            int    `json:"luck" default:"50"`
 	CurrentScenario int    `json:"current_scenario"`
 	EventHistory    []int  `json:"event_history" default:"[]"`
@@ -48,15 +47,6 @@ func (p *Player) GetGender() string {
 
 func (p *Player) GetSchool() string {
 	return p.School
-}
-
-// Get and Set methods for Wealth
-func (p *Player) GetWealth() int {
-	return p.Wealth
-}
-
-func (p *Player) SetWealth(value int) {
-	p.Wealth = value
 }
 
 // Get and Set methods for Charisma
