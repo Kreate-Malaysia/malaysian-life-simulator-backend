@@ -1,12 +1,22 @@
-package user
+package services
 
 import (
-    "fmt"
-    "gin/database"
+	"database/sql"
+	"fmt"
+	"gin/database"
 )
 
+// UserService struct
+type UserService struct {
+	DB *sql.DB
+}
+
+func NewUserService(db *sql.DB) *UserService {
+	return &UserService{DB: db}
+}
+
 // SaveUser saves the user's email and name into the database
-func SaveUser(email, name string) error {
+func (u *UserService) SaveUser(email, name string) error {
     query := `INSERT INTO users (email, name) VALUES ($1, $2)
               ON CONFLICT (email) DO NOTHING` // Avoid duplicate entries
     _, err := database.DB.Exec(query, email, name)
