@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"gin/config"
-	user "gin/service"
+	"gin/services"
 	"net/http"
 	"time"
 
@@ -12,6 +12,15 @@ import (
 )
 
 var jwtSecret []byte // JWT secret extracted from cfg
+
+type GoogleController struct {
+	UserService *services.UserService
+}
+
+func NewGoogleController(userService *services.UserService) *GoogleController {
+	return &GoogleController{UserService: userService}
+}
+
 
 // InitializeGoogleOAuth initializes the package-level configuration
 func InitializeGoogleOAuth(cfg *config.Config) {
@@ -68,7 +77,8 @@ func ValidateGoogleAccessToken(accessToken string) (string, string, error) {
 }
 
 // HandleOAuthCallback handles the request from the frontend
-func HandleOAuthCallback(w http.ResponseWriter, r *http.Request) {
+func (c *GoogleController)  HandleOAuthCallback(w http.ResponseWriter, r *http.Request) {
+	
 	// Parse the JSON payload from the frontend
 	var payload GoogleTokenPayload
 	err := json.NewDecoder(r.Body).Decode(&payload)
@@ -84,7 +94,7 @@ func HandleOAuthCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Call the user service to save the user
-	err = user.SaveUser(email, name)
+	err = c.UserService.SaveUser(email, name)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Failed to save user: %v", err), http.StatusInternalServerError)
 		return
