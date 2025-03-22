@@ -24,9 +24,13 @@ func SetupRoutes(router *gin.Engine) {
 	// Initialize services
 	googleService := services.NewGoogleOAuthService(database.DB)
 	userService := services.NewUserService(database.DB, googleService)
+	playerService := services.NewPlayerService(database.DB)
+	feedbackService := services.NewFeedbackService(database.DB)
 
 	// Initialize controllers
 	userController := controller.NewUserController(userService, googleService)
+	playerController := controller.NewPlayerController(playerService)
+	feedbackController := controller.NewFeedbackController(feedbackService)
 
     // Register the route for login
     router.POST("/api/login", func(ctx *gin.Context) {
@@ -47,4 +51,24 @@ func SetupRoutes(router *gin.Engine) {
     router.POST("/api/google/signup", func(ctx *gin.Context) {
         userController.HandleSignupWithGoogleAccessToken(ctx.Writer, ctx.Request)
     })
+
+	//Create Player
+	router.POST("/api/player/create", func(ctx *gin.Context) {
+		playerController.HandleCreatePlayer(ctx.Writer, ctx.Request)
+	})
+
+	//Get Player
+	router.GET("/api/player/get", func(ctx *gin.Context) {
+		playerController.HandleGetPlayer(ctx.Writer, ctx.Request)
+	})
+
+	//Update Player
+	router.POST("/api/player/update", func(ctx *gin.Context) {
+		playerController.HandleUpdatePlayerStats(ctx.Writer, ctx.Request)
+	})
+
+	//Create Feedback
+	router.POST("/api/feedback", func(ctx *gin.Context) {
+		feedbackController.HandleCreateFeedback(ctx.Writer, ctx.Request)
+	})
 }

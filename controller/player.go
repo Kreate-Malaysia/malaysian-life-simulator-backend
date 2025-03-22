@@ -16,7 +16,7 @@ func NewPlayerController(playerService *services.PlayerService) *PlayerControlle
 }
 
 // CreatePlayer handles the creation of a new player
-func (pc *PlayerController) CreatePlayer(w http.ResponseWriter, r *http.Request) {
+func (pc *PlayerController) HandleCreatePlayer(w http.ResponseWriter, r *http.Request) {
     var payload struct {
         UserID int    `json:"user_id"`
         Name   string `json:"name"`
@@ -41,7 +41,7 @@ func (pc *PlayerController) CreatePlayer(w http.ResponseWriter, r *http.Request)
 }
 
 // GetPlayer handles retrieving a player by ID
-func (pc *PlayerController) GetPlayer(w http.ResponseWriter, r *http.Request) {
+func (pc *PlayerController) HandleGetPlayer(w http.ResponseWriter, r *http.Request) {
     var requestBody struct {
         PlayerID int `json:"player_id"`
     }
@@ -65,7 +65,7 @@ func (pc *PlayerController) GetPlayer(w http.ResponseWriter, r *http.Request) {
 }
 
 // UpdatePlayerStatsHandler handles the request to update a player's stats
-func (pc *PlayerController) UpdatePlayerStats(w http.ResponseWriter, r *http.Request) {
+func (pc *PlayerController) HandleUpdatePlayerStats(w http.ResponseWriter, r *http.Request) {
     var requestBody struct {
         PlayerID   int            `json:"player_id"`
         NewStats   map[string]int `json:"new_stats"`
