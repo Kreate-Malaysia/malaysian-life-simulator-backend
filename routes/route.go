@@ -71,4 +71,10 @@ func SetupRoutes(router *gin.Engine) {
 	router.POST("/api/feedback", func(ctx *gin.Context) {
 		feedbackController.HandleCreateFeedback(ctx.Writer, ctx.Request)
 	})
+
+	//Get Scenario
+	router.GET("/api/scenario", func(ctx *gin.Context) {
+		scenarioController := controller.NewScenarioController(services.NewScenarioService(database.DB))
+		scenarioController.GetScenarioByID(ctx.Writer, ctx.Request)
+	})
 }
