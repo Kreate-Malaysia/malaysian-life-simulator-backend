@@ -41,7 +41,7 @@ func (ps *PlayerService) CreatePlayer(userID int, name string, gender string, ra
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
         RETURNING id
     `
-    err := ps.DB.QueryRow(query, player.UserID, player.Name, player.Race,player.Gender, player.Intelligence, player.Charisma, player.Popularity, player.Strength, player.Luck, player.CurrentScenario, "{}").Scan(&player.ID)
+    err := ps.DB.QueryRow(query, player.UserID, player.Name, player.Race,player.Gender, player.Intelligence, player.Charisma, player.Popularity, player.Strength, player.Luck, player.CurrentScenario, "{}").Scan(&player.Id)
     if err != nil {
         return nil, fmt.Errorf("failed to create player: %v", err)
     }
@@ -59,7 +59,7 @@ func (ps *PlayerService) GetPlayer(playerID int) (*models.Player, error) {
     `
     row := ps.DB.QueryRow(query, playerID)
     var eventHistory []byte
-    err := row.Scan(&player.ID, &player.UserID, &player.Name, &player.Race, &player.Gender, &player.Intelligence, &player.Charisma, &player.Popularity, &player.Strength, &player.Luck, &player.CurrentScenario, &eventHistory)
+    err := row.Scan(&player.Id, &player.UserID, &player.Name, &player.Race, &player.Gender, &player.Intelligence, &player.Charisma, &player.Popularity, &player.Strength, &player.Luck, &player.CurrentScenario, &eventHistory)
     if err == sql.ErrNoRows {
         return nil, fmt.Errorf("player not found")
     } else if err != nil {

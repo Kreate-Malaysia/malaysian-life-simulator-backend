@@ -27,7 +27,7 @@ func (fs *FeedbackService) CreateFeedback(scenarioId int, feedbackText string) (
         VALUES ($1, $2)
         RETURNING id
     `
-    err := fs.DB.QueryRow(query, feedback.ScenarioId, feedback.Feedback).Scan(&feedback.ID)
+    err := fs.DB.QueryRow(query, feedback.ScenarioId, feedback.Feedback).Scan(&feedback.Id)
     if (err != nil) {
         return nil, fmt.Errorf("failed to create feedback: %v", err)
     }

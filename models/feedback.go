@@ -2,7 +2,6 @@ package models
 
 type Feedback struct {
 	modelImpl
-	ID         int    `json:"id"`
 	ScenarioId int    `json:"scenario_id"`
 	Feedback   string `json:"feedback"`
 }

@@ -2,7 +2,6 @@ package models
 
 type Player struct {
 	modelImpl
-	ID              int    `json:"id"`
 	UserID          int    `json:"user_id"`
 	Name            string `json:"name"`
 	Intelligence    int    `json:"intelligence" default:"50"`
