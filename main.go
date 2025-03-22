@@ -2,8 +2,8 @@ package main
 
 import (
 	"gin/config"
+	"gin/controller"
 	"gin/database"
-	"gin/googleoauth"
 	"gin/services"
 	"log"
 	"net/http"
@@ -14,23 +14,28 @@ import (
 func main() {
     // Load environment config
     cfg, err := config.LoadConfig()
-    if (err != nil) {
+    if err != nil {
         log.Fatalf("Error loading config: %v", err)
     }
 
     // Initialize database connection
     database.InitDB(cfg)
-
-    // Initialize Google OAuth with the loaded config
-    googleoauth.InitializeGoogleOAuth(cfg)
-
+    
 	// Initialize services
-	userService := services.NewUserService(database.DB)
-
-	googleController := googleoauth.NewGoogleController(userService)
-
-    // Register the route for handling OAuth callback
-    http.HandleFunc("/api/oauth/callback", googleController.HandleOAuthCallback)
+    googleService := services.NewGoogleOAuthService(database.DB)
+	userService := services.NewUserService(database.DB,googleService)
+    
+	userController := controller.NewUserController(userService,googleService)
+    
+    
+    // Register the route for login
+    http.HandleFunc("/api/login", userController.HandleLogin)
+    // Register the route for signup
+    http.HandleFunc("/api/signup", userController.HandleSignup)
+    // Register the route for login using Google OAuth
+    http.HandleFunc("/api/google/login", userController.HandleLoginWithGoogleAccessToken)
+    // Register the route for signup using Google OAuth
+    http.HandleFunc("/api/google/signup", userController.HandleSignupWithGoogleAccessToken)
 
     // Start the HTTP server
     log.Println("Server started at :8080")
