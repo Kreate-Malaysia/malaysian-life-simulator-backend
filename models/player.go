@@ -5,9 +5,6 @@ type Player struct {
 	ID              int    `json:"id"`
 	UserID          int    `json:"user_id"`
 	Name            string `json:"name"`
-	Race            string `json:"race"`
-	Gender          string `json:"gender"`
-	School          string `json:"school"`
 	Intelligence    int    `json:"intelligence" default:"50"`
 	Charisma        int    `json:"charisma" default:"50"`
 	Popularity      int    `json:"popularity" default:"50"`
@@ -15,6 +12,10 @@ type Player struct {
 	Luck            int    `json:"luck" default:"50"`
 	CurrentScenario int    `json:"current_scenario"`
 	EventHistory    []int  `json:"event_history" default:"[]"`
+	Race            string `json:"race"`
+	Gender          string `json:"gender"`
+	School          string `json:"school"`
+	StudentType     string `json:"student_type"`
 }
 
 // Get and Set methods for Popularity
@@ -40,13 +41,33 @@ func (p *Player) GetRace() string {
 	return p.Race
 }
 
+func (p *Player) SetRace(value string) {
+	p.Race = value
+}
+
 // Get Gender
 func (p *Player) GetGender() string {
 	return p.Gender
 }
 
+func (p *Player) SetGender(value string) {
+	p.Gender = value
+}
+
 func (p *Player) GetSchool() string {
 	return p.School
+}
+
+func (p *Player) SetSchool(value string) {
+	p.School = value
+}
+
+func (p *Player) GetStudentType() string {
+	return p.StudentType
+}
+
+func (p *Player) SetStudentType(value string) {
+	p.StudentType = value
 }
 
 // Get and Set methods for Charisma

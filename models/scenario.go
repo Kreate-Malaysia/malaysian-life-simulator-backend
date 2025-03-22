@@ -2,22 +2,12 @@ package models
 
 type Scenario struct {
     modelImpl
-    ID            int    `json:"id"`
     Description   string `json:"description"`
     IsChoice      bool   `json:"is_choice"`
     IsStory       bool   `json:"is_story"`
     IsRandom      bool   `json:"is_random"`
-    LeadsTo       bool   `json:"leads_to"`
+    LeadsTo       int   `json:"leads_to"`
     IsConditional bool   `json:"is_conditional"`
-}
-
-// Get and Set methods for ID
-func (sc *Scenario) GetID() int {
-    return sc.ID
-}
-
-func (sc *Scenario) SetID(id int) {
-    sc.ID = id
 }
 
 // Get and Set methods for Description
@@ -57,11 +47,11 @@ func (sc *Scenario) SetIsRandom(isRandom bool) {
 }
 
 // Get and Set methods for LeadsTo
-func (sc *Scenario) GetLeadsTo() bool {
+func (sc *Scenario) GetLeadsTo() int {
     return sc.LeadsTo
 }
 
-func (sc *Scenario) SetLeadsTo(leadsTo bool) {
+func (sc *Scenario) SetLeadsTo(leadsTo int) {
     sc.LeadsTo = leadsTo
 }
 

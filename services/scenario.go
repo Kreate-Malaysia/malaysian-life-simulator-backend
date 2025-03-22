@@ -53,7 +53,7 @@ func (sc *ScenarioService) GetScenarioByID(id int) (*models.Scenario, error) {
     row := sc.DB.QueryRow(query, id)
 
     var scenario models.Scenario
-    err := row.Scan(&scenario.ID, &scenario.Description, &scenario.IsChoice, &scenario.IsStory, &scenario.IsRandom, &scenario.LeadsTo, &scenario.IsConditional)
+    err := row.Scan(&scenario.Id, &scenario.Description, &scenario.IsChoice, &scenario.IsStory, &scenario.IsRandom, &scenario.LeadsTo, &scenario.IsConditional)
     if err == sql.ErrNoRows {
         log.Println("No scenario found with the given ID:", id)
         return nil, nil

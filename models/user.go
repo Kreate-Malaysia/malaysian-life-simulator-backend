@@ -23,3 +23,11 @@ func (u *User) GetName() string {
 func (u *User) GetEmail() string {
 	return u.Email
 }
+
+func (u *User) SetName(value string) {
+	u.UserName = value
+}
+
+func (u *User) SetEmail(value string) {
+	u.Email = value
+}
