@@ -75,21 +75,29 @@ func (ps *PlayerService) GetPlayer(playerID int) (*models.Player, error) {
 }
 
 // UpdatePlayer updates a player's attributes in the database
-func (ps *PlayerService) UpdatePlayer(player *models.Player) error {
-    query := `
-        UPDATE players
-        SET intelligence = $1, charisma = $2, popularity = $3, strength = $4, wealth = $5, luck = $6, current_scenario = $7, event_history = $8
-        WHERE id = $9
-    `
-    eventHistory, err := json.Marshal(player.EventHistory)
+func (ps *PlayerService) UpdatePlayerStats(playerID, choiceID int) error {
+    var intelligenceChange, strengthChange, charismaChange, popularityChange, scenarioId int
+
+    // Fetch stat modifications from the choice
+    err := ps.DB.QueryRow(`
+        SELECT intelligence_change, strength_change, charisma_change, popularity_change, scenario_id
+        FROM choices WHERE id = $1
+    `, choiceID).Scan(&intelligenceChange, &strengthChange, &charismaChange, &popularityChange, &scenarioId)
     if err != nil {
-        return fmt.Errorf("failed to serialize event history: %v", err)
+        return err
     }
 
-    _, err = ps.DB.Exec(query, player.Intelligence, player.Charisma, player.Popularity, player.Strength, player.Wealth, player.Luck, player.CurrentScenario, eventHistory, player.ID)
-    if err != nil {
-        return fmt.Errorf("failed to update player: %v", err)
-    }
+    // Update player stats
+    _, err = ps.DB.Exec(`
+        UPDATE players SET 
+            intelligence = intelligence + $1,
+            strength = strength + $2,
+            charisma = charisma + $3
+            popularity = popularity + $4
+            current_scenario = $5
+            event_history = array_append(event_history, $6)
+        WHERE id = $7
+    `, intelligenceChange, strengthChange, charismaChange, popularityChange, scenarioId, choiceID, playerID)
 
-    return nil
+    return err
 }
