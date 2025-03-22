@@ -19,7 +19,7 @@ func NewPlayerService(db *sql.DB) *PlayerService {
 }
 
 // CreatePlayer creates a new player in the database
-func (ps *PlayerService) CreatePlayer(userID int, name string, gender string, race string) (*models.Player, error) {
+func (ps *PlayerService) CreatePlayer(userID int, name string, gender string, race string, school string) (*models.Player, error) {
     randomLuck := rand.Intn(101) // Generate a random number between 0 and 100
 
     player := &models.Player{
@@ -27,6 +27,8 @@ func (ps *PlayerService) CreatePlayer(userID int, name string, gender string, ra
         Name:            name,
 		Race:			 race,
 		Gender: 		 gender,
+        School:          school,
+        StudentType:     "",
         Intelligence:    50,
         Charisma:        50,
         Popularity:      50,
@@ -37,11 +39,11 @@ func (ps *PlayerService) CreatePlayer(userID int, name string, gender string, ra
     }
 
     query := `
-        INSERT INTO players (user_id, name, race, gender, intelligence, charisma, popularity, strength, luck, current_scenario, event_history)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        INSERT INTO players (user_id, name, race, gender, school, student_type, intelligence, charisma, popularity, strength, luck, current_scenario, event_history)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
         RETURNING id
     `
-    err := ps.DB.QueryRow(query, player.UserID, player.Name, player.Race,player.Gender, player.Intelligence, player.Charisma, player.Popularity, player.Strength, player.Luck, player.CurrentScenario, "{}").Scan(&player.Id)
+    err := ps.DB.QueryRow(query, player.UserID, player.Name, player.Race, player.Gender, player.School, player.StudentType, player.Intelligence, player.Charisma, player.Popularity, player.Strength, player.Luck, player.CurrentScenario, "{}").Scan(&player.Id)
     if err != nil {
         return nil, fmt.Errorf("failed to create player: %v", err)
     }
@@ -53,7 +55,7 @@ func (ps *PlayerService) CreatePlayer(userID int, name string, gender string, ra
 func (ps *PlayerService) GetPlayer(playerID int) (*models.Player, error) {
     player := &models.Player{}
     query := `
-        SELECT id, user_id, name, race, gender, intelligence, charisma, popularity, strength, luck, current_scenario, event_history
+        SELECT id, user_id, name, race, gender, school, student_type, intelligence, charisma, popularity, strength, luck, current_scenario, event_history
         FROM players
         WHERE id = $1
     `

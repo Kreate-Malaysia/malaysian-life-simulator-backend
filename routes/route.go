@@ -29,7 +29,7 @@ func SetupRoutes(router *gin.Engine) {
 
 	// Initialize controllers
 	userController := controller.NewUserController(userService, googleService)
-	playerController := controller.NewPlayerController(playerService)
+	playerController := controller.NewPlayerController(playerService, userService)
 	feedbackController := controller.NewFeedbackController(feedbackService)
 
     // Register the route for login

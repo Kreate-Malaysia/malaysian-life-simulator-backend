@@ -8,34 +8,66 @@ import (
 
 type PlayerController struct {
     PlayerService *services.PlayerService
+    UserService   *services.UserService
 }
 
 // NewPlayerController creates a new instance of PlayerController
-func NewPlayerController(playerService *services.PlayerService) *PlayerController {
+func NewPlayerController(playerService *services.PlayerService, UserService *services.UserService) *PlayerController {
     return &PlayerController{PlayerService: playerService}
 }
 
 // CreatePlayer handles the creation of a new player
 func (pc *PlayerController) HandleCreatePlayer(w http.ResponseWriter, r *http.Request) {
-    var payload struct {
-        UserID int    `json:"user_id"`
-        Name   string `json:"name"`
-        Gender string `json:"gender"`
-        Race   string `json:"race"`
+    var requestBody struct {
+        Name        string `json:"name"`
+        Gender      string `json:"gender"`
+        Race        string `json:"race"`
+        SchoolType  string `json:"school_type"`
     }
 
-    err := json.NewDecoder(r.Body).Decode(&payload)
-    if err != nil || payload.UserID == 0 || payload.Name == "" || payload.Gender == "" || payload.Race == "" {
-        http.Error(w, "Invalid request payload", http.StatusBadRequest)
+    // Decode the JSON request body
+    if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
+        http.Error(w, "Invalid request body", http.StatusBadRequest)
         return
     }
 
-    player, err := pc.PlayerService.CreatePlayer(payload.UserID, payload.Name, payload.Gender, payload.Race)
+    // Extract the JWT token from the Authorization header
+    authHeader := r.Header.Get("Authorization")
+    if authHeader == "" {
+        http.Error(w, "Authorization header is missing", http.StatusUnauthorized)
+        return
+    }
+
+    // Remove the "Bearer " prefix from the token
+    const bearerPrefix = "Bearer "
+    if len(authHeader) <= len(bearerPrefix) || authHeader[:len(bearerPrefix)] != bearerPrefix {
+        http.Error(w, "Invalid Authorization header format", http.StatusUnauthorized)
+        return
+    }
+    jwtToken := authHeader[len(bearerPrefix):]
+
+    // Decode the JWT token to extract user_id
+    decodedData, err := pc.UserService.DecodeJWT(jwtToken)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusUnauthorized)
+        return
+    }
+
+    // Extract user_id from the claims
+    userID, ok := decodedData["user_id"].(int) // JWT claims are parsed as float64
+    if !ok {
+        http.Error(w, "Invalid user_id in token", http.StatusUnauthorized)
+        return
+    }
+
+    // Call the PlayerService to create a new player
+    player, err := pc.PlayerService.CreatePlayer(int(userID), requestBody.Name, requestBody.Gender, requestBody.Race)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
     }
 
+    // Respond with the created player
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(player)
 }
