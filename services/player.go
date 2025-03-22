@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"gin/models"
 	"math/rand"
+	"strconv"
 )
 
 type PlayerService struct {
@@ -74,30 +75,41 @@ func (ps *PlayerService) GetPlayer(playerID int) (*models.Player, error) {
     return player, nil
 }
 
-// UpdatePlayer updates a player's attributes in the database
-func (ps *PlayerService) UpdatePlayerStats(playerID, choiceID int) error {
-    var intelligenceChange, strengthChange, charismaChange, popularityChange, scenarioId int
-
-    // Fetch stat modifications from the choice
-    err := ps.DB.QueryRow(`
-        SELECT intelligence_change, strength_change, charisma_change, popularity_change, scenario_id
-        FROM choices WHERE id = $1
-    `, choiceID).Scan(&intelligenceChange, &strengthChange, &charismaChange, &popularityChange, &scenarioId)
-    if err != nil {
-        return err
+// UpdatePlayer replaces a player's attributes with new values 
+func (ps *PlayerService) UpdatePlayerStats(playerID int, newStats map[string]int, newScenario int) error {
+    // Ensure all expected stats are provided
+    requiredStats := []string{"intelligence", "charisma", "popularity", "strength", "wealth", "luck"}
+    for _, stat := range requiredStats {
+        if _, exists := newStats[stat]; !exists {
+            return fmt.Errorf("missing required stat: %s", stat)
+        }
     }
 
-    // Update player stats
-    _, err = ps.DB.Exec(`
-        UPDATE players SET 
-            intelligence = intelligence + $1,
-            strength = strength + $2,
-            charisma = charisma + $3
-            popularity = popularity + $4
-            current_scenario = $5
-            event_history = array_append(event_history, $6)
-        WHERE id = $7
-    `, intelligenceChange, strengthChange, charismaChange, popularityChange, scenarioId, choiceID, playerID)
+    // Construct the SQL query dynamically
+    query := "UPDATE players SET "
+    args := []interface{}{}
+    argIndex := 1
 
+    for stat, value := range newStats {
+        if argIndex > 1 {
+            query += ", "
+        }
+        query += stat + " = $" + strconv.Itoa(argIndex)
+        args = append(args, value)
+        argIndex++
+    }
+
+    // Append the current scenario to event_history and update current_scenario
+    query += ", event_history = array_append(event_history, current_scenario), current_scenario = $" + strconv.Itoa(argIndex)
+    args = append(args, newScenario)
+    argIndex++
+
+    query += " WHERE id = $" + strconv.Itoa(argIndex)
+    args = append(args, playerID)
+
+    // Execute the query
+    _, err := ps.DB.Exec(query, args...)
     return err
 }
+
+
