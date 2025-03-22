@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"gin/config"
+	user "gin/service"
 	"net/http"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var jwtSecret []byte   // JWT secret extracted from cfg
+var jwtSecret []byte // JWT secret extracted from cfg
 
 // InitializeGoogleOAuth initializes the package-level configuration
 func InitializeGoogleOAuth(cfg *config.Config) {
@@ -20,6 +21,7 @@ func InitializeGoogleOAuth(cfg *config.Config) {
 // GoogleTokenPayload represents the payload received from the frontend
 type GoogleTokenPayload struct {
 	AccessToken string `json:"access_token"`
+	Name        string `json:"name"`
 }
 
 // JWTResponse represents the response containing the JWT token
@@ -38,32 +40,31 @@ func GenerateJWT(email string) (string, error) {
 	return token.SignedString(jwtSecret)
 }
 
-// ValidateGoogleAccessToken validates the Google access token and retrieves the user's email
-func ValidateGoogleAccessToken(accessToken string) (string, error) {
-	// Call Google's token info endpoint
+// ValidateGoogleAccessToken validates the Google access token and retrieves the user's email and name
+func ValidateGoogleAccessToken(accessToken string) (string, string, error) {
 	resp, err := http.Get(fmt.Sprintf("https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=%s", accessToken))
 	if err != nil {
-		return "", fmt.Errorf("failed to validate access token: %v", err)
+		return "", "", fmt.Errorf("failed to validate access token: %v", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("invalid access token, status code: %d", resp.StatusCode)
+		return "", "", fmt.Errorf("invalid access token, status code: %d", resp.StatusCode)
 	}
 
-	// Parse the response to extract the email
 	var tokenInfo struct {
 		Email string `json:"email"`
+		Name  string `json:"name"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&tokenInfo); err != nil {
-		return "", fmt.Errorf("failed to parse token info response: %v", err)
+		return "", "", fmt.Errorf("failed to parse token info response: %v", err)
 	}
 
 	if tokenInfo.Email == "" {
-		return "", fmt.Errorf("email not found in token info")
+		return "", "", fmt.Errorf("email not found in token info")
 	}
 
-	return tokenInfo.Email, nil
+	return tokenInfo.Email, tokenInfo.Name, nil
 }
 
 // HandleOAuthCallback handles the request from the frontend
@@ -76,10 +77,16 @@ func HandleOAuthCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Validate the Google access token and get the user's email
-	email, err := ValidateGoogleAccessToken(payload.AccessToken)
+	email, name, err := ValidateGoogleAccessToken(payload.AccessToken)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Failed to validate access token: %v", err), http.StatusUnauthorized)
+		return
+	}
+
+	// Call the user service to save the user
+	err = user.SaveUser(email, name)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to save user: %v", err), http.StatusInternalServerError)
 		return
 	}
 
@@ -90,7 +97,6 @@ func HandleOAuthCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Respond with the JWT token
 	response := JWTResponse{Token: token}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
