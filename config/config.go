@@ -9,6 +9,7 @@ import (
 type Config struct {
 	DB    PostgresConfig
 	OAuth GoogleOAuthConfig
+	JWT   JWTConfig
 }
 
 type PostgresConfig struct {
@@ -21,16 +22,23 @@ type GoogleOAuthConfig struct {
 	RedirectURL  string
 }
 
+type JWTConfig struct {
+	JWTSecret string
+}
+
 
 func LoadConfig() (*Config, error) {
 	cfg := &Config{
 		DB: PostgresConfig{
 			Url: os.Getenv("POSTGRES_URL"),
-		},
+		},	
 		OAuth: GoogleOAuthConfig{
 			ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
 			ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
 			RedirectURL:  os.Getenv("GOOGLE_REDIRECT_URL"),
+		},
+		JWT: JWTConfig{	
+			JWTSecret: os.Getenv("JWT_SECRET"),
 		},
 	}
 
